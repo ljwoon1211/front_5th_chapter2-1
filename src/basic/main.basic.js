@@ -14,23 +14,17 @@ let lastSelectedItem,
 let ui;
 
 const initApp = () => {
-  // 상품 데이터 초기화
   products = initialProducts;
 
-  // UI 모듈 초기화
   ui = createUI();
   ui.initialize();
-
-  // 상품 목록 렌더링
   ui.updateProductOptions(products);
 
-  // 이벤트 리스너 설정
   ui.setupEventListeners(handleAddToCart, handleClickCartButton);
 
   // 초기 장바구니 상태 표시
   initializeCart();
 
-  // 타이머 설정
   setupFlashSaleTimer(products, ui.updateProductOptions);
   setupProductSuggestionTimer(products, ui.updateProductOptions, () => lastSelectedItem);
 };
@@ -101,9 +95,6 @@ const calculateCart = () => {
 
 /**
  * for문으로 아이템별 수량, 가격 계산
- * @param {HTMLElement} cartItem - 처리할 장바구니 아이템 요소
- * @param {number} currentSubTotal - 현재까지의 소계
- * @returns {Object} 업데이트된 소계를 포함한 객체
  */
 const processCartItem = (cartItem, currentSubTotal) => {
   let subTotal = currentSubTotal;
