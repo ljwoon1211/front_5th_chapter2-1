@@ -1,5 +1,5 @@
 import React from 'react';
-import { CartProvider } from '../CartContext.tsx';
+import { CartProvider } from '../contexts/CartContext';
 import { CartComponent } from './CartComponent';
 
 const AppComponent: React.FC = () => {
