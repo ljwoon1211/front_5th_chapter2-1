@@ -13,11 +13,9 @@ export const CartTotal: React.FC<CartTotalProps> = ({ totalAmount, discountRate,
       {discountRate > 0 && (
         <span className="text-green-500 ml-2">({(discountRate * 100).toFixed(1)}% 할인 적용)</span>
       )}
-      {bonusPoints > 0 && (
-        <span id="loyalty-points" className="text-blue-500 ml-2">
-          (포인트: {bonusPoints})
-        </span>
-      )}
+      <span id="loyalty-points" className="text-blue-500 ml-2">
+        (포인트: {bonusPoints})
+      </span>
     </div>
   );
 };

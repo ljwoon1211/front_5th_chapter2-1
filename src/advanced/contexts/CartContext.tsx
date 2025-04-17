@@ -15,8 +15,6 @@ export interface CartContextType {
   setState: (newState: Partial<AppState>) => void;
   initState: (products?: Product[]) => void;
   addToCart: (productId: string) => void;
-  removeFromCart: (productId: string) => void;
-  updateQuantity: (productId: string, change: number) => void;
 }
 
 export const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -27,11 +25,6 @@ interface CartProviderProps {
 
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [state, setStateInternal] = useState<AppState>({ ...initialState });
-
-  // 디버깅을 위한 상태 변경 로깅
-  useEffect(() => {
-    console.log('상태 업데이트:', state);
-  }, [state]);
 
   const setState = (newState: Partial<AppState>) => {
     setStateInternal((prevState) => {
@@ -71,18 +64,6 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     });
   };
 
-  // 장바구니에서 상품 제거
-  const removeFromCart = (productId: string) => {
-    // 상품 수량 복구 로직을 포함해야 함
-    // 실제 구현은 컴포넌트에서 처리
-  };
-
-  // 장바구니 상품 수량 변경
-  const updateQuantity = (productId: string, change: number) => {
-    // 수량 변경 로직
-    // 실제 구현은 컴포넌트에서 처리
-  };
-
   useEffect(() => {
     initState();
   }, []);
@@ -94,8 +75,6 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         setState,
         initState,
         addToCart,
-        removeFromCart,
-        updateQuantity,
       }}
     >
       {children}

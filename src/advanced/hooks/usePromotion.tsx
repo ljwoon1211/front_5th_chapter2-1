@@ -3,7 +3,11 @@ import { Product } from '../types';
 import CONSTANTS from '../constants';
 import { useCart } from './useCart';
 
-export const usePromotion = () => {
+/**
+ * 프로모션 기능을 관리하는 커스텀 훅
+ * @param updateCartItemPrices 장바구니 아이템 가격 업데이트 함수
+ */
+export const usePromotion = (updateCartItemPrices: (updatedProducts: Product[]) => void) => {
   const { state, setState } = useCart();
   const { products, lastSelectedItem } = state;
 
@@ -24,21 +28,19 @@ export const usePromotion = () => {
 
   const updateProducts = useCallback(
     (updatedProducts: Product[]) => {
-      console.log('상품 업데이트:', updatedProducts);
       setState({ products: updatedProducts });
+
+      updateCartItemPrices(updatedProducts);
     },
-    [setState]
+    [setState, updateCartItemPrices]
   );
 
-  // 번개 세일 타이머 설정
   const setupFlashSaleTimer = useCallback(() => {
     let timeoutId: number | null = null;
     let intervalId: number | null = null;
 
     const flashSaleCallback = () => {
       try {
-        console.log('번개세일 타이머 실행 중...', productsRef.current);
-
         const currentProducts = [...productsRef.current];
         const luckyItemIndex = Math.floor(Math.random() * currentProducts.length);
         const luckyItem = currentProducts[luckyItemIndex];
@@ -55,6 +57,7 @@ export const usePromotion = () => {
             price: discountedPrice,
           };
 
+          // 알림 표시
           alert(`번개세일! ${luckyItem.name}이(가) 20% 할인 중입니다!`);
 
           updateProducts(updatedProducts);
@@ -64,10 +67,13 @@ export const usePromotion = () => {
       }
     };
 
-    timeoutId = window.setTimeout(() => {
-      intervalId = window.setInterval(flashSaleCallback, CONSTANTS.FLASH_SALE_INTERVAL);
-      flashSaleCallback();
-    }, Math.random() * CONSTANTS.FLASH_SALE_INITIAL_DELAY);
+    timeoutId = window.setTimeout(
+      () => {
+        intervalId = window.setInterval(flashSaleCallback, CONSTANTS.FLASH_SALE_INTERVAL);
+        flashSaleCallback();
+      },
+      Math.random() * CONSTANTS.FLASH_SALE_INITIAL_DELAY + 1000
+    );
 
     return () => {
       if (timeoutId !== null) {
@@ -86,13 +92,11 @@ export const usePromotion = () => {
 
     const suggestionCallback = () => {
       try {
-        console.log('상품 추천 타이머 실행 중...', productsRef.current);
-
-        // 현재 상품 배열과 선택된 아이템으로 작업
         const currentProducts = [...productsRef.current];
         const lastSelectedItem = getLastSelectedItem();
 
         if (lastSelectedItem) {
+          // 마지막으로 선택한 상품이 아니면서 재고가 있는 상품들 필터링
           const availableProducts = currentProducts.filter(
             (item) => item.id !== lastSelectedItem && item.quantity > 0
           );
@@ -129,13 +133,11 @@ export const usePromotion = () => {
 
       try {
         const lastItem = getLastSelectedItem();
-        console.log('첫 상품 추천 시도...', lastItem);
       } catch (e) {
         console.error('첫 상품 추천 시도 중 오류:', e);
       }
     }, Math.random() * CONSTANTS.SUGGESTION_INITIAL_DELAY);
 
-    // 정리 함수 반환
     return () => {
       if (timeoutId !== null) {
         window.clearTimeout(timeoutId);
@@ -147,14 +149,10 @@ export const usePromotion = () => {
   }, [getLastSelectedItem, updateProducts]);
 
   useEffect(() => {
-    console.log('프로모션 타이머 설정');
-
     const flashSaleCleanup = setupFlashSaleTimer();
     const productSuggestionCleanup = setupProductSuggestionTimer();
 
-    // 컴포넌트 언마운트 시 타이머 정리
     return () => {
-      console.log('프로모션 타이머 정리');
       flashSaleCleanup();
       productSuggestionCleanup();
     };

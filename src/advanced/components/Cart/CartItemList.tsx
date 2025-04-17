@@ -13,10 +13,6 @@ export const CartItemList: React.FC<CartItemListProps> = ({
   onQuantityChange,
   onRemoveItem,
 }) => {
-  if (items.length === 0) {
-    return <div className="text-gray-500 py-4 text-center">장바구니가 비어 있습니다.</div>;
-  }
-
   return (
     <div id="cart-items">
       {items.map((item) => (

@@ -25,11 +25,6 @@ interface CartProviderProps {
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [state, setStateInternal] = useState<AppState>({ ...initialState });
 
-  // 디버깅을 위한 상태 변경 로깅
-  useEffect(() => {
-    console.log('상태 업데이트:', state);
-  }, [state]);
-
   const setState = (newState: Partial<AppState>) => {
     setStateInternal((prevState) => {
       const updatedState = { ...prevState, ...newState };

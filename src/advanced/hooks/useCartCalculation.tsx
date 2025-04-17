@@ -14,14 +14,22 @@ export const useCartCalculation = (cartItems: CartItem[]) => {
   const [discountRate, setDiscountRate] = useState<number>(0);
   const [bonusPoints, setBonusPoints] = useState<number>(0);
 
-  /**
-   * 장바구니 계산 함수
-   * */
+  // 컴포넌트 마운트 시 초기 상태 설정 - 포인트를 0으로 표시
+  useEffect(() => {
+    setState({
+      totalAmount: 0,
+      bonusPoints: 0,
+      itemCount: 0,
+    });
+  }, []);
+
+  // 장바구니 계산 함수
   const calculateCart = () => {
     if (cartItems.length === 0) {
       setTotalAmount(0);
       setDiscountRate(0);
       setBonusPoints(0);
+      // 중복 코드 제거 - setState는 초기화 useEffect에서만 호출
       return;
     }
 
@@ -80,12 +88,6 @@ export const useCartCalculation = (cartItems: CartItem[]) => {
       bonusPoints: points,
       itemCount,
     });
-  };
-
-  // 장바구니 아이템 가격 업데이트
-  const updateCartItemPrices = (updatedProducts: typeof products) => {
-    // 장바구니 아이템 가격 업데이트 로직 구현
-    // 이 로직은 해당 컴포넌트에서 구현해야 함
   };
 
   const getLowStockProducts = () => {
