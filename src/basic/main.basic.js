@@ -3,7 +3,6 @@ import CONSTANTS from './config/constants';
 import initialProducts from './data/products';
 import { setupFlashSaleTimer, setupProductSuggestionTimer } from './utils/promotion';
 
-// 전역 상태 변수들
 let products;
 let lastSelectedItem,
   bonusPoints = 0,
@@ -154,13 +153,19 @@ const handleClickCartButton = (event) => {
         itemElement.querySelector('span').textContent =
           itemElement.querySelector('span').textContent.split('x ')[0] + 'x ' + newQuantity;
         product.quantity -= quantityChange;
-      } else if (newQuantity <= 0) {
+      }
+      //
+      else if (newQuantity <= 0) {
         itemElement.remove();
         product.quantity -= quantityChange;
-      } else {
+      }
+      //
+      else {
         alert('재고가 부족합니다.');
       }
-    } else if (targetElement.classList.contains('remove-item')) {
+    }
+    //
+    else if (targetElement.classList.contains('remove-item')) {
       const removedQuantity = parseInt(itemElement.querySelector('span').textContent.split('x ')[1]);
       product.quantity += removedQuantity;
       itemElement.remove();
