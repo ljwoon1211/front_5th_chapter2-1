@@ -141,7 +141,7 @@ export const setupProductSuggestionTimer = (
     } catch (e) {
       console.error('첫 상품 추천 시도 중 오류:', e);
     }
-  }, Math.random() * CONSTANTS.SUGGESTION_INITIAL_DELAY + 2000); // 최소 2초 후에 시작
+  }, Math.random() * CONSTANTS.SUGGESTION_INITIAL_DELAY); // 최소 2초 후에 시작
 
   // 정리 함수 반환
   return () => {
