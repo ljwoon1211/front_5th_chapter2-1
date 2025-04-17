@@ -1,6 +1,7 @@
 import createUI from './components/createUI';
 import CONSTANTS from './config/constants';
 import initialProducts from './data/products';
+import { setupFlashSaleTimer, setupProductSuggestionTimer } from './utils/promotion';
 
 // 전역 상태 변수들
 let products;
@@ -14,7 +15,7 @@ let ui;
 
 const initApp = () => {
   // 상품 데이터 초기화
-  products = JSON.parse(JSON.stringify(initialProducts));
+  products = initialProducts;
 
   // UI 모듈 초기화
   ui = createUI();
@@ -30,8 +31,8 @@ const initApp = () => {
   initializeCart();
 
   // 타이머 설정
-  setupFlashSaleTimer();
-  setupProductSuggestionTimer();
+  setupFlashSaleTimer(products, ui.updateProductOptions);
+  setupProductSuggestionTimer(products, ui.updateProductOptions, () => lastSelectedItem);
 };
 
 /**
@@ -47,44 +48,6 @@ const initializeCart = () => {
   ui.updateTotalPrice(totalAmount, 0);
   ui.renderBonusPoints(bonusPoints);
   ui.updateStockInfoDisplay(products);
-};
-
-/**
- * 번개세일 타이머 설정
- */
-const setupFlashSaleTimer = () => {
-  // 번개 세일 로직
-  const intervalCallback = () => {
-    const luckyItem = products[Math.floor(Math.random() * products.length)];
-    if (Math.random() < CONSTANTS.FLASH_SALE_CHANCE && luckyItem.quantity > 0) {
-      luckyItem.price = Math.round(luckyItem.price * (1 - CONSTANTS.FLASH_SALE_DISCOUNT_RATE));
-      alert('번개세일! ' + luckyItem.name + '이(가) 20% 할인 중입니다!');
-      ui.updateProductOptions(products);
-    }
-  };
-
-  // 타이머 설정
-  setTimeout(() => {
-    setInterval(intervalCallback, CONSTANTS.FLASH_SALE_INTERVAL);
-  }, Math.random() * CONSTANTS.FLASH_SALE_INITIAL_DELAY);
-};
-
-/**
- * 상품 추천 타이머 설정
- */
-const setupProductSuggestionTimer = () => {
-  setTimeout(() => {
-    setInterval(() => {
-      if (lastSelectedItem) {
-        const suggest = products.find((item) => item.id !== lastSelectedItem && item.quantity > 0);
-        if (suggest) {
-          alert(suggest.name + '은(는) 어떠세요? 지금 구매하시면 5% 추가 할인!');
-          suggest.price = Math.round(suggest.price * (1 - CONSTANTS.SUGGESTED_PRODUCT_DISCOUNT_RATE));
-          ui.updateProductOptions(products);
-        }
-      }
-    }, CONSTANTS.SUGGESTION_INTERVAL);
-  }, Math.random() * CONSTANTS.SUGGESTION_INITIAL_DELAY);
 };
 
 /**
