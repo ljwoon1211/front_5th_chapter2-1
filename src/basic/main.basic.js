@@ -12,6 +12,8 @@ const initApp = () => {
   ui.initialize();
   ui.updateProductOptions(getState().products);
 
+  window.ui = ui;
+
   subscribe((state) => {
     ui.updateStockInfoDisplay(state.products);
   });
@@ -23,8 +25,8 @@ const initApp = () => {
 
   ui.setupEventListeners(addToCartHandler, cartItemClickHandler);
 
-  setupFlashSaleTimer(getState().products, ui.updateProductOptions);
-  setupProductSuggestionTimer(getState().products, ui.updateProductOptions, () => getState().lastSelectedItem);
+  setupFlashSaleTimer(ui.updateProductOptions);
+  setupProductSuggestionTimer(ui.updateProductOptions, () => getState().lastSelectedItem);
 };
 
 initApp();

@@ -2,6 +2,7 @@
 import js from '@eslint/js';
 import prettierPlugin from 'eslint-plugin-prettier';
 import prettierConfig from 'eslint-config-prettier';
+import importPlugin from 'eslint-plugin-import';
 
 export default [
   js.configs.recommended,
@@ -28,10 +29,18 @@ export default [
         // Vite 환경 특정 전역 변수
         import: 'readonly',
         'import.meta': 'readonly',
+        process: 'readonly',
+        __dirname: 'readonly',
+        __filename: 'readonly',
+        // Vite 설정 내에서 정의할 수 있는 사용자 정의 전역 변수
+        __IS_BASIC__: 'readonly',
+        __MODE__: 'readonly',
       },
     },
     plugins: {
       prettier: prettierPlugin,
+      import: importPlugin,
+
     },
     rules: {
       'prettier/prettier': 'warn',

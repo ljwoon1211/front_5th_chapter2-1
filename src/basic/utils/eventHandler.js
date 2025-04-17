@@ -37,7 +37,10 @@ export const handleAddToCart = (ui) => {
 export const handleClickCartButton = (event, ui) => {
   const targetElement = event.target;
 
-  if (targetElement.classList.contains('quantity-change') || targetElement.classList.contains('remove-item')) {
+  if (
+    targetElement.classList.contains('quantity-change') ||
+    targetElement.classList.contains('remove-item')
+  ) {
     const state = getState();
     const productId = targetElement.dataset.productId;
     const itemElement = document.getElementById(productId);
@@ -51,12 +54,17 @@ export const handleClickCartButton = (event, ui) => {
 
     if (targetElement.classList.contains('quantity-change')) {
       const quantityChange = parseInt(targetElement.dataset.change);
-      const currentQuantity = parseInt(itemElement.querySelector('span').textContent.split('x ')[1]);
+      // 텍스트에서 현재 수량 추출
+      const itemTextParts = itemElement.querySelector('span').textContent.split('x ');
+      const currentQuantity = parseInt(itemTextParts[1]);
       const newQuantity = currentQuantity + quantityChange;
 
-      if (newQuantity > 0 && (quantityChange < 0 || newQuantity <= product.quantity + currentQuantity)) {
-        itemElement.querySelector('span').textContent =
-          itemElement.querySelector('span').textContent.split('x ')[0] + 'x ' + newQuantity;
+      // 가격 부분 추출 (상품명 - 가격원)
+      const namePriceText = itemTextParts[0].trim();
+
+      if (newQuantity > 0 && (quantityChange < 0 || product.quantity >= quantityChange)) {
+        // 최신 가격으로 업데이트 (할인이 적용된 경우를 위해)
+        itemElement.querySelector('span').textContent = namePriceText + ' x ' + newQuantity;
 
         updatedProducts[productIndex] = {
           ...product,
@@ -74,7 +82,9 @@ export const handleClickCartButton = (event, ui) => {
         return;
       }
     } else if (targetElement.classList.contains('remove-item')) {
-      const removedQuantity = parseInt(itemElement.querySelector('span').textContent.split('x ')[1]);
+      const removedQuantity = parseInt(
+        itemElement.querySelector('span').textContent.split('x ')[1]
+      );
 
       itemElement.remove();
 

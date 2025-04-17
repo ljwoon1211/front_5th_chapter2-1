@@ -26,7 +26,8 @@ const createUI = () => {
     elements.stockInfoDisplay.id = 'stock-status';
 
     container.className = 'bg-gray-100 p-8';
-    wrapper.className = 'max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl p-8';
+    wrapper.className =
+      'max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl p-8';
     heading.className = 'text-2xl font-bold mb-4';
     elements.totalPriceDisplay.className = 'text-xl font-bold my-4';
     elements.productSelect.className = 'border rounded p-2 mr-2';
@@ -61,8 +62,12 @@ const createUI = () => {
 
   // 장바구니 총액 표시 업데이트
   const updateTotalPrice = (totalAmount, discountRate) => {
-    // 기존 내용 초기화
+    const pointsTag = document.getElementById('loyalty-points');
     elements.totalPriceDisplay.textContent = `총액: ${Math.round(totalAmount)}원`;
+
+    if (pointsTag) {
+      elements.totalPriceDisplay.appendChild(pointsTag);
+    }
 
     if (discountRate > 0) {
       const span = document.createElement('span');
@@ -105,9 +110,12 @@ const createUI = () => {
     const existingItem = document.getElementById(product.id);
 
     if (existingItem) {
-      const currentQuantity = parseInt(existingItem.querySelector('span').textContent.split('x ')[1]);
+      const currentQuantity = parseInt(
+        existingItem.querySelector('span').textContent.split('x ')[1]
+      );
       const newQuantity = currentQuantity + quantity;
-      existingItem.querySelector('span').textContent = `${product.name} - ${product.price}원 x ${newQuantity}`;
+      existingItem.querySelector('span').textContent =
+        `${product.name} - ${product.price}원 x ${newQuantity}`;
     } else {
       const newItem = document.createElement('div');
       newItem.id = product.id;

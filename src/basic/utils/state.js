@@ -14,6 +14,13 @@ export const getState = () => ({ ...state });
 
 export const setState = (newState) => {
   state = { ...state, ...newState };
+  notifyListeners();
+};
+
+const notifyListeners = () => {
+  listeners.forEach((listener) => {
+    listener(getState());
+  });
 };
 
 export const subscribe = (listener) => {
