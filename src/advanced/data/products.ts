@@ -1,4 +1,3 @@
-// products.ts
 import { Product } from '../types';
 
 const initialProducts: Product[] = [

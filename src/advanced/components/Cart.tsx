@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from 'react';
-import { useCart } from '../CartContext.tsx';
-import { calculateCartTotals } from '../utils/calculateCarts.ts';
+import React, { useEffect, useRef, useCallback } from 'react';
+import { useCart } from '../CartContext';
+import { calculateCartTotals } from '../utils/calculateCarts';
 import { setupFlashSaleTimer, setupProductSuggestionTimer } from '../utils/promotion';
 import { Product } from '../types';
 
@@ -8,10 +8,24 @@ const Cart: React.FC = () => {
   const { state, setState } = useCart();
   const { products, lastSelectedItem, totalAmount, bonusPoints } = state;
 
+  // 컴포넌트 참조 저장
   const cartItemsRef = useRef<HTMLDivElement>(null);
   const productSelectRef = useRef<HTMLSelectElement>(null);
   const stockInfoRef = useRef<HTMLDivElement>(null);
   const totalPriceRef = useRef<HTMLDivElement>(null);
+
+  // 최신 상태를 유지하기 위한 ref
+  const productsRef = useRef<Product[]>(products);
+  const lastSelectedItemRef = useRef<string | null>(lastSelectedItem);
+
+  // 상태가 변경될 때마다 ref 업데이트
+  useEffect(() => {
+    productsRef.current = products;
+  }, [products]);
+
+  useEffect(() => {
+    lastSelectedItemRef.current = lastSelectedItem;
+  }, [lastSelectedItem]);
 
   // 장바구니에 상품 추가
   const handleAddToCart = () => {
@@ -151,8 +165,9 @@ const Cart: React.FC = () => {
     }
   };
 
-  // 상품 선택 옵션 업데이트
-  const updateProductOptions = (updatedProducts: Product[]) => {
+  // 콜백 함수로 캐싱하여 재생성 방지
+  const updateProductOptions = useCallback((updatedProducts: Product[]) => {
+    console.log('상품 옵션 업데이트', updatedProducts);
     if (!productSelectRef.current) return;
     productSelectRef.current.innerHTML = '';
 
@@ -163,7 +178,12 @@ const Cart: React.FC = () => {
       if (product.quantity === 0) option.disabled = true;
       productSelectRef.current?.appendChild(option);
     });
-  };
+  }, []);
+
+  // 최신 lastSelectedItem을 반환하는 함수 생성
+  const getLastSelectedItem = useCallback(() => {
+    return lastSelectedItemRef.current;
+  }, []);
 
   // 장바구니 총액 표시 업데이트
   const updateTotalPrice = (totalAmount: number, discountRate: number) => {
@@ -229,29 +249,45 @@ const Cart: React.FC = () => {
 
   // 초기화 및 프로모션 타이머 설정
   useEffect(() => {
+    console.log('초기화 및 타이머 설정');
     updateProductOptions(products);
     updateStockInfoDisplay(products);
 
     const cartItemsElement = cartItemsRef.current;
     if (cartItemsElement) {
-      cartItemsElement.addEventListener('click', handleCartItemClick);
+      // 타입스크립트에서 Event 타입 호환을 위한 변환 함수
+      const handleClick = (e: Event) => handleCartItemClick(e as unknown as MouseEvent);
+      cartItemsElement.addEventListener('click', handleClick);
     }
 
-    // 프로모션 타이머 설정
-    setupFlashSaleTimer(products, updateProductOptions, (newState) => setState(newState));
-
-    setupProductSuggestionTimer(
-      products,
+    // 프로모션 타이머 설정 - 정리 함수 받기
+    const flashSaleCleanup = setupFlashSaleTimer(
+      productsRef.current,
       updateProductOptions,
-      () => lastSelectedItem,
-      (newState) => setState(newState)
+      setState
     );
+
+    const productSuggestionCleanup = setupProductSuggestionTimer(
+      productsRef.current,
+      updateProductOptions,
+      getLastSelectedItem, // useCart()를 직접 호출하지 않는 함수로 변경
+      setState
+    );
+
+    // 정리 함수
     return () => {
+      console.log('타이머 정리');
       if (cartItemsElement) {
-        cartItemsElement.removeEventListener('click', handleCartItemClick);
+        // 타입스크립트에서 Event 타입 호환을 위한 변환 함수
+        const handleClick = (e: Event) => handleCartItemClick(e as unknown as MouseEvent);
+        cartItemsElement.removeEventListener('click', handleClick);
       }
+
+      // 타이머 정리
+      flashSaleCleanup();
+      productSuggestionCleanup();
     };
-  }, []);
+  }, [updateProductOptions, getLastSelectedItem, products, setState]);
 
   // state 변경시 UI 업데이트
   useEffect(() => {

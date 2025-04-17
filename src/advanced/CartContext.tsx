@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { AppState, Product } from './types';
-import initialProducts from './data/product';
+import initialProducts from './data/products';
 
 const initialState: AppState = {
   products: [],
@@ -22,11 +22,19 @@ interface CartProviderProps {
   children: ReactNode;
 }
 
-export const CartProvider = ({ children }: CartProviderProps) => {
+export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [state, setStateInternal] = useState<AppState>({ ...initialState });
 
+  // 디버깅을 위한 상태 변경 로깅
+  useEffect(() => {
+    console.log('상태 업데이트:', state);
+  }, [state]);
+
   const setState = (newState: Partial<AppState>) => {
-    setStateInternal(prevState => ({ ...prevState, ...newState }));
+    setStateInternal((prevState) => {
+      const updatedState = { ...prevState, ...newState };
+      return updatedState;
+    });
   };
 
   const initState = (products: Product[] = initialProducts) => {
@@ -40,15 +48,15 @@ export const CartProvider = ({ children }: CartProviderProps) => {
     initState();
   }, []);
 
-  const contextValue = {
-    state,
-    setState,
-    initState
-  };
-
   return (
-    <CartContext.Provider value= { contextValue } >
-    { children }
+    <CartContext.Provider
+      value={{
+        state,
+        setState,
+        initState,
+      }}
+    >
+      {children}
     </CartContext.Provider>
   );
 };
