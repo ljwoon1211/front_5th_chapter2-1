@@ -1,12 +1,12 @@
 import React from 'react';
 import { CartProvider } from '../contexts/CartContext';
-import { CartComponent } from './CartComponent';
+import Cart from './Cart/index';
 
 const AppComponent: React.FC = () => {
   return (
     <CartProvider>
       <div id="app">
-        <CartComponent />
+        <Cart />
       </div>
     </CartProvider>
   );

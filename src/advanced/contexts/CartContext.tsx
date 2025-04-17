@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
-import { AppState, Product } from '../types';
+import { AppState, Product } from '../types/index';
 import initialProducts from '../data/products';
 
 const initialState: AppState = {

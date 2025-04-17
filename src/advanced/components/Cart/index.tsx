@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useCart } from '../../hooks/useCart';
-import { usePromotion } from '../../hooks/usePromotion';
-import { useCartCalculation } from '../../hooks/useCartCalculation';
+import { usePromotion } from '../../hooks/usePromotion.tsx';
+import { useCartCalculation } from '../../hooks/useCartCalculation.tsx';
 import { CartItem as CartItemType, Product } from '../../types/index';
 
 import CartItemList from './CartItemList.tsx';
