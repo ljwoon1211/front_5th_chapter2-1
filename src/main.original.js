@@ -1,3 +1,25 @@
+// 상수 정의
+const CONSTANTS = {
+  BULK_DISCOUNT_THRESHOLD: 30,
+  BULK_DISCOUNT_RATE: 0.25,
+  TUESDAY_DISCOUNT_RATE: 0.1,
+  FLASH_SALE_DISCOUNT_RATE: 0.2,
+  SUGGESTED_PRODUCT_DISCOUNT_RATE: 0.05,
+  FLASH_SALE_CHANCE: 0.3,
+  FLASH_SALE_INTERVAL: 30000,
+  FLASH_SALE_INITIAL_DELAY: 10000,
+  SUGGESTION_INTERVAL: 60000,
+  SUGGESTION_INITIAL_DELAY: 20000,
+  PRODUCT_DISCOUNTS: {
+    p1: 0.1, // 상품1 할인율
+    p2: 0.15, // 상품2 할인율
+    p3: 0.2, // 상품3 할인율
+    p4: 0.05, // 상품4 할인율
+    p5: 0.25, // 상품5 할인율
+  },
+  QUANTITY_DISCOUNT_THRESHOLD: 10,
+};
+
 let products, productSelect, addToCartButton, selectedItemsContainer, totalPriceDisplay, stockInfoDisplay;
 
 let lastSelectedItem,
@@ -73,8 +95,8 @@ const setupFlashSaleTimer = () => {
   // 번개 세일 로직
   const intervalCallback = () => {
     const luckyItem = products[Math.floor(Math.random() * products.length)];
-    if (Math.random() < 0.3 && luckyItem.quantity > 0) {
-      luckyItem.price = Math.round(luckyItem.price * 0.8);
+    if (Math.random() < CONSTANTS.FLASH_SALE_CHANCE && luckyItem.quantity > 0) {
+      luckyItem.price = Math.round(luckyItem.price * CONSTANTS.FLASH_SALE_DISCOUNT_RATE);
       alert('번개세일! ' + luckyItem.name + '이(가) 20% 할인 중입니다!');
       updateProductOptions();
     }
@@ -82,8 +104,8 @@ const setupFlashSaleTimer = () => {
 
   // 타이머 설정
   setTimeout(() => {
-    setInterval(() => intervalCallback, 30000);
-  }, Math.random() * 10000);
+    setInterval(() => intervalCallback, CONSTANTS.FLASH_SALE_INTERVAL);
+  }, Math.random() * CONSTANTS.FLASH_SALE_INITIAL_DELAY);
 
   // 테스트를 위해 콜백 함수 반환
   return { intervalCallback };
@@ -99,12 +121,12 @@ const setupProductSuggestionTimer = () => {
         const suggest = products.find((item) => item.id !== lastSelectedItem && item.quantity > 0);
         if (suggest) {
           alert(suggest.name + '은(는) 어떠세요? 지금 구매하시면 5% 추가 할인!');
-          suggest.price = Math.round(suggest.price * 0.95);
+          suggest.price = Math.round(suggest.price * CONSTANTS.SUGGESTED_PRODUCT_DISCOUNT_RATE);
           updateProductOptions();
         }
       }
-    }, 60000);
-  }, Math.random() * 20000);
+    }, CONSTANTS.SUGGESTION_INTERVAL);
+  }, Math.random() * CONSTANTS.SUGGESTION_INITIAL_DELAY);
 };
 
 /**
@@ -140,13 +162,13 @@ const calcCart = () => {
   let discountRate = 0;
 
   // 아이템 수량 별 할인율
-  if (itemCount >= 30) {
-    const bulkDiscount = totalAmount * 0.25;
+  if (itemCount >= CONSTANTS.BULK_DISCOUNT_THRESHOLD) {
+    const bulkDiscount = totalAmount * CONSTANTS.BULK_DISCOUNT_RATE;
     const itemDiscount = subTotal - totalAmount;
 
     if (bulkDiscount > itemDiscount) {
-      totalAmount = subTotal * (1 - 0.25);
-      discountRate = 0.25;
+      totalAmount = subTotal * (1 - CONSTANTS.BULK_DISCOUNT_RATE);
+      discountRate = CONSTANTS.BULK_DISCOUNT_RATE;
     } else {
       discountRate = (subTotal - totalAmount) / subTotal;
     }
@@ -155,8 +177,8 @@ const calcCart = () => {
   }
 
   if (new Date().getDay() === 2) {
-    totalAmount *= 1 - 0.1;
-    discountRate = Math.max(discountRate, 0.1);
+    totalAmount *= 1 - CONSTANTS.TUESDAY_DISCOUNT_RATE;
+    discountRate = Math.max(discountRate, CONSTANTS.TUESDAY_DISCOUNT_RATE);
   }
 
   // 기존 내용 초기화
@@ -190,19 +212,15 @@ const processCartItem = (cartItem, currentSubTotal) => {
     }
   }
 
-  const quantity = parseInt(cartItem.querySelector('span').textContent.split('x ')[1]);
-  const itemTotal = currentProduct.price * quantity;
+  const itemQuantity = parseInt(cartItem.querySelector('span').textContent.split('x ')[1]);
+  const itemTotal = currentProduct.price * itemQuantity;
   let discountRate = 0;
 
-  itemCount += quantity;
+  itemCount += itemQuantity;
   subTotal += itemTotal;
 
-  if (quantity >= 10) {
-    if (currentProduct.id === 'p1') discountRate = 0.1;
-    else if (currentProduct.id === 'p2') discountRate = 0.15;
-    else if (currentProduct.id === 'p3') discountRate = 0.2;
-    else if (currentProduct.id === 'p4') discountRate = 0.05;
-    else if (currentProduct.id === 'p5') discountRate = 0.25;
+  if (itemQuantity >= CONSTANTS.QUANTITY_DISCOUNT_THRESHOLD) {
+    discountRate = CONSTANTS.PRODUCT_DISCOUNTS[currentProduct.id];
   }
 
   totalAmount += itemTotal * (1 - discountRate);
